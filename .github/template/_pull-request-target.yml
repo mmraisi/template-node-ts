@@ -1,0 +1,27 @@
+# ----------------------------------------------- #
+# Note: this file originates in template-template #
+# ----------------------------------------------- #
+
+name: pull_request_target
+
+on: pull_request_target
+
+# Concurrency settings ensure only one job runs at a time for a specific combination of Git ref and workflow.
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+
+jobs:
+  auto-merge:
+    # only run for dependabot PRs
+    if: github.actor == 'dependabot[bot]'
+    uses: ./.github/workflows/_auto-merge.yml
+    secrets: inherit
+
+  metadata:
+    uses: ./.github/workflows/_metadata.yml
+
+  template-sync:
+    needs:
+      - metadata
+    uses: ./.github/workflows/_template-sync.yml
+    secrets: inherit
